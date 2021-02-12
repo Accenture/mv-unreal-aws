@@ -12,8 +12,17 @@ but can be used as an utility to that effect.
 
 ## Usage
 ### Unreal Engine
-To use, copy this repository into the `Plugins`
-folder of your Unreal Project. It may be necessary to 
+To use, clone this repository directly into the `Plugins`
+folder of your Unreal Project. Like this:
+
+```
+cd /your/Unreal/Project
+cd Plugins
+git clone --depth 1 --recursive git@github.com:mackevision/mv-unreal-aws.git MVAWS
+```
+
+Re-create the Visual Studio project solution afterwards.
+It may be necessary to 
 explicitly load the plugin in your project's Plugins setting.
 The plugin has no outside dependencies and includes a binary build
 of the [AWS SDK for C++](https://aws.amazon.com/sdk-for-cpp/)
@@ -282,9 +291,9 @@ synchronous. Meaning they block the current thread until
 finished. If the XRay client cannot connect to 
 the appropriate backend (for example because it is in an 
 isolated subnet without NAT) the application will stall 
-until it times out. To avoid this,
-`end_trace_segment()` will not actually send telemetry 
-unless the environment variable MVAWS_XRAY_ENABLED is set to any value.
+until it times out. Use the config Actor's `XRayEnabled` 
+property or the env override `MVAWS_ENABLE_XRAY` to control 
+the behavior.
 
 ## AWS SDK
 A note about the [AWS SDK](https://github.com/aws/aws-sdk-cpp).
