@@ -12,7 +12,7 @@ public class AWSSDK : ModuleRules {
 
     public AWSSDK(ReadOnlyTargetRules Target) : base(Target) {
 
-        Type = ModuleType.External;
+		Type = ModuleType.External;
 
 		// This one is a bit concerning. During Link, some static symbols in 
 		// the SDK weren't found. This fixes it but it should always be the case for DLL linkage
@@ -21,8 +21,8 @@ public class AWSSDK : ModuleRules {
 		// add any macros that need to be set. This is just an example define.
 		PublicDefinitions.Add("WITH_AWSSDK=1");
 
-        // add include path
-        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "include"));
+		// add include path
+		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "include"));
 
 		// configure link libraries. This basically makes it windows x64 only
 		string LibrariesPath = Path.Combine(ModuleDirectory, "lib", "Win64");
