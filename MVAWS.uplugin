@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 2,
+	"VersionName": "1.0",
+	"FriendlyName": "MV-Unreal-AWS",
+	"Description": "AWS SDK client adaption",
+	"Category": "MVPlugins",
+	"CreatedBy": "Mackevision Media Design Gmbh.",
+	"CreatedByURL": "http://www.mackevision.com/",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "MVAWS",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
