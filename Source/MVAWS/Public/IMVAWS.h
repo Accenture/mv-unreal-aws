@@ -8,46 +8,38 @@
 #include "Templates/UniquePtr.h"
 #include "Templates/SharedPointer.h"
 
-#include "IMVAWS.generated.h"
-
 DECLARE_LOG_CATEGORY_EXTERN(LogMVAWS, Log, All);
 
 /// First parameter is success, second is name of object
 DECLARE_DELEGATE_TwoParams(FOnCacheUploadFinished, bool, FString);
 
-/*! An SQS queue message that came in to be handled or disregarded
+/** An SQS queue message that came in to be handled or disregarded
  */
-USTRUCT(BlueprintType)
-struct FMVAWSMessage 
-{
-	GENERATED_BODY()
+struct FMVAWSMessage {
 
-	UPROPERTY(BlueprintReadWrite)
+	/// internally used
 	FString m_message_id;
 
-	/*!
-	* use this to delete (acknowledge reception) the message
-	*/
-	UPROPERTY(BlueprintReadWrite)
+	/**
+	 * use this to delete (acknowledge reception) the message
+	 */
 	FString m_receipt;
 
-	/*!
-	* age is in milliseconds
-	*/
+	/**
+	 * age is in milliseconds
+	 */
 	uint32  m_message_age;
 
-	/*!
+	/**
 	 * is set when contained in the message response.
 	 * This can be used as trace_id for start_trace_segment() and related functions 
 	 * to measure steps along the way of this message being processed
 	 */
-	UPROPERTY(BlueprintReadWrite)
 	FString m_xray_header;
 
-	/*!
+	/**
 	 * message body
 	 */
-	UPROPERTY(BlueprintReadWrite)
 	FString m_body;
 };
 
@@ -59,13 +51,10 @@ using SQSReturnPromisePtr = TSharedPtr<SQSReturnPromise, ESPMode::ThreadSafe>;
 DECLARE_DELEGATE_TwoParams(FOnSQSMessageReceived, FMVAWSMessage, SQSReturnPromisePtr);
 
 
-/*!
-* S3 upload destination info
-*/
-USTRUCT()
-struct FS3UploadTarget 
-{
-	GENERATED_BODY()
+/**
+ * S3 upload destination info
+ */
+struct FS3UploadTarget {
 
 	/**
 	 * The bucket to upload into
@@ -74,16 +63,16 @@ struct FS3UploadTarget
 	 */
 	FString BucketName;
 
-	/*!
-	* Full object key including suffix
-	*/
+	/**
+	 * Full object key including suffix
+	 */
 	FString ObjectKey;
 
-	/*!
-	* S3 objects can have content type. It is important to set this for
-	* compatibility when serving the content using CloudFront.
-	* This is given in the Content-Type HTTP header
-	*/
+	/**
+	 * S3 objects can have content type. It is important to set this for
+	 * compatibility when serving the content using CloudFront.
+	 * This is given in the Content-Type HTTP header
+	 */
 	FString ContentType = TEXT("image/jpg");
 };
 

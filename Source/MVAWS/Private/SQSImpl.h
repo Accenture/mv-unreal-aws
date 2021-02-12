@@ -13,8 +13,7 @@
 
 #include "SQSImpl.generated.h"
 
-namespace Aws::SQS::Model 
-{
+namespace Aws::SQS::Model {
 	class Message;
 }
 
