@@ -112,6 +112,16 @@ class MVAWS_API AAWSConnectionConfig : public AActor
 		 */
 		UPROPERTY(EditAnywhere, Category = "MVAWS|SQS")
 		bool SyncDelete = true;
+		
+		/**
+		 * @brief set to true if you want SQS handler delegate to fire on game thread.
+		 * It may be beneficial in certain use cases to not not wait for the next game tick but
+		 * be able to react right away. If setting this to true, the handler will be called in
+		 * MVAWS' polling thread. This means, special care must be taken when calling engine
+		 * functionality. If unsure, leave true.
+		 */
+		UPROPERTY(EditAnywhere, Category = "MVAWS|SQS")
+		bool SQSHandlerOnGameThread = true;
 
 		/**
 		 * @brief enable XRay tracing

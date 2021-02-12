@@ -19,9 +19,9 @@
 #include "Windows/PostWindowsApi.h"
 
 #include <iostream>
-#include <fstream>
+//#include <fstream>
 #include <memory>
-#include <strstream>
+//#include <strstream>
 
 DEFINE_LOG_CATEGORY(LogMVAWS)
 #define LOCTEXT_NAMESPACE "FMVAWSModule"
@@ -29,15 +29,14 @@ DEFINE_LOG_CATEGORY(LogMVAWS)
 static TUniquePtr<FCloudWatchLogOutputDevice> s_cwl_output_device = nullptr;
 
 
-void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config) 
-{
+void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config) {
+
 	checkf(m_monitoring_impl, TEXT("Monitoring impl object was not created"));
 	checkf(m_xray_impl, TEXT("XRay impl object was not created"));
 	checkf(m_s3_impl,   TEXT("S3 impl object was not created"));
 	checkf(m_sqs_impl,  TEXT("SQS impl object was not created"));
 	
-	if (n_config) 
-	{
+	if (n_config) {
 		m_xray_enabled = xray_enabled(n_config->XRayEnabled);
 
 		// Create a CloudWatch log output device so all logs
@@ -52,8 +51,7 @@ void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config)
 
 		m_s3_impl->set_default_bucket_name(readenv(n_config->BucketNameEnvVariableName, n_config->BucketName));
 
-		if (n_config->AWSLogs) 
-		{
+		if (n_config->AWSLogs) {
 			// You won't need logging in live system. This is file IO after all.
 			// Disable this for production unless you need it
 			Aws::Utils::Logging::InitializeAWSLogging(
@@ -61,7 +59,7 @@ void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config)
 					"MVAllocationTag", Aws::Utils::Logging::LogLevel::Info, "aws_sdk_"));
 		}
 
-		m_sqs_impl->set_parameters(n_config->QueueURL, n_config->LongPollWait);
+		m_sqs_impl->set_parameters(n_config->QueueURL, n_config->LongPollWait, n_config->SQSHandlerOnGameThread);
 
 		if (cloudwatch_metrics_enabled(n_config->CloudWatchMetrics)) {
 			m_monitoring_impl->start_metrics();
@@ -69,9 +67,7 @@ void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config)
 
 		// Now let's try our logging right away
 		UE_LOG(LogMVAWS, Display, TEXT("MVAWS initialized"));
-	} 
-	else 
-	{
+	} else {
 		UE_LOG(LogMVAWS, Display, TEXT("MVAWS shutting down"));
 		m_xray_enabled = false;
 		m_s3_impl->set_default_bucket_name(FString{});
@@ -89,8 +85,8 @@ void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config)
 	}
 }
 
-void FMVAWSModule::StartupModule() 
-{
+void FMVAWSModule::StartupModule() {
+
 	UE_LOG(LogMVAWS, Display, TEXT("Starting AWS Connector Plugin"));
 
 	m_sdk_options.loggingOptions.logLevel = Aws::Utils::Logging::LogLevel::Info;
@@ -107,8 +103,8 @@ void FMVAWSModule::StartupModule()
 	m_sqs_impl->AddToRoot();
 }
 
-void FMVAWSModule::ShutdownModule() 
-{
+void FMVAWSModule::ShutdownModule() {
+
 	UE_LOG(LogMVAWS, Display, TEXT("Shutting down AWS Connector Plugin"));
 
 	Aws::Utils::Logging::ShutdownAWSLogging();

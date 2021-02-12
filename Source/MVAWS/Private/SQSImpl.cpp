@@ -25,21 +25,21 @@
 
 using namespace Aws::SQS::Model;
 
-void USQSImpl::set_parameters(const FString &n_queue_url, unsigned int n_wait_time)
-{
+void USQSImpl::set_parameters(const FString &n_queue_url, const unsigned int n_wait_time, const bool n_handle_on_game_thread) {
+
 	m_queue_url = TCHAR_TO_UTF8(*n_queue_url);
 	m_long_poll_wait_time = n_wait_time;
+	m_handler_on_game_thread = n_handle_on_game_thread;
 }
 
-bool USQSImpl::start_polling(FOnSQSMessageReceived &&n_delegate)
-{
+bool USQSImpl::start_polling(FOnSQSMessageReceived &&n_delegate) {
+
 	stop_polling();
 	join();
 
 	m_poll_interrupted.Store(false);
 
-	if (m_queue_url.empty())
-	{
+	if (m_queue_url.empty()) {
 		UE_LOG(LogMVAWS, Warning, TEXT("Must have SQS URL"));
 		return false;
 	}
@@ -47,16 +47,14 @@ bool USQSImpl::start_polling(FOnSQSMessageReceived &&n_delegate)
 	Aws::Client::ClientConfiguration client_config;
 	client_config.enableEndpointDiscovery = use_endpoint_discovery();
 	const FString sqs_endpoint = readenv(TEXT("MVAWS_SQS_ENDPOINT"));
-	if (!sqs_endpoint.IsEmpty())
-	{
+	if (!sqs_endpoint.IsEmpty()) {
 		client_config.endpointOverride = TCHAR_TO_UTF8(*sqs_endpoint);
 	}
 
 	m_sqs = MakeShareable<Aws::SQS::SQSClient>(new Aws::SQS::SQSClient(client_config));
 	m_delegate = n_delegate;
 
-	if (!m_delegate.IsBound())
-	{
+	if (!m_delegate.IsBound()) {
 		UE_LOG(LogMVAWS, Warning, TEXT("Cannot start to poll without a bound delegate"));
 		return false;
 	}
@@ -225,13 +223,16 @@ void USQSImpl::process_message(const Message &n_message) const noexcept
 	TFuture<bool> return_future = rp->GetFuture();
 
 	// Call the delegate on the game thread
+	if (m_handler_on_game_thread) {
+		FGraphEventRef game_thread_task
+			= FFunctionGraphTask::CreateAndDispatchWhenReady([m, handler{ this->m_delegate }, rp]{
 
-	FGraphEventRef game_thread_task
-		= FFunctionGraphTask::CreateAndDispatchWhenReady([m, handler{ this->m_delegate }, rp]{
+				handler.Execute(m, rp);
 
-			handler.Execute(m, rp);
-
-			}, TStatId(), NULL, ENamedThreads::GameThread);
+				}, TStatId(), NULL, ENamedThreads::GameThread);
+	} else {
+		m_delegate.Execute(m, rp);
+	}
 
 	// Now we wait for the delegate impl to call SetValue() on the promise.
 	// This might take forever if the implementation is not careful.
@@ -239,9 +240,7 @@ void USQSImpl::process_message(const Message &n_message) const noexcept
 	return_future.Wait();
 	if (return_future.Get()) {
 		delete_message(n_message);
-	}
-	else
-	{
+	} else {
 		UE_LOG(LogMVAWS, Display, TEXT("Not deleting message '%s', handler returned false"), *m.m_message_id);
 	}
 }

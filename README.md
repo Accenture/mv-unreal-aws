@@ -221,6 +221,9 @@ IMVAWSModule::Get().stop_sqs_poll();
 The user must implement a delegate handler with these parameters.
 Each message received will trigger the handler on the game thread.
 A return promise is given into the handler and must be fulfilled by the caller.
+Use the config property `SQSHandlerOnGameThread` to call the handler directly
+in the loop and not post to the game thread. In this case the caller is responsible
+for not calling engine logic that is not safe to be used outside the game thread.
 
 The return promise must always be fulfilled for the polling process to continue.
 Setting the value to false will cause new messages to come in.

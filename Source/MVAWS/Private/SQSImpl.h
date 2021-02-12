@@ -27,13 +27,12 @@ namespace Aws::SQS {
 * This has no other function than bundle SQS related stuff in one place.
 */
 UCLASS()
-class USQSImpl : public UObject 
-{
+class USQSImpl : public UObject {
 
 	GENERATED_BODY()
 
 	public:
-		void set_parameters(const FString &n_queue_url, unsigned int n_wait_time);
+		void set_parameters(const FString &n_queue_url, const unsigned int n_wait_time, const bool n_handle_on_game_thread);
 		
 		/*! I assume one queue for all our messages.
 		 * This also starts the listening process. If the string is empty,
@@ -58,6 +57,7 @@ class USQSImpl : public UObject
 		Aws::String           m_queue_url;
 		unsigned int          m_long_poll_max_msg;
 		unsigned int          m_long_poll_wait_time;
+		bool                  m_handler_on_game_thread;
 
 		TUniquePtr<FThread>   m_poll_thread;
 		TAtomic<bool>         m_poll_interrupted;
