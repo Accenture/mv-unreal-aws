@@ -106,16 +106,6 @@ class MVAWS_API AAWSConnectionConfig : public AActor
 		int LongPollWait = 5;
 
 		/**
-		 * If you set this to true, messages are deleted synchronously as soon as you call delete_message().
-		 * This will reduce the chance of the same message being received by other nodes but block this one
-		 * until the call returns. It should be set to false for strategies that try to maximize throughput 
-		 * by having many nodes race for the same result. In short, if you want to save execution costs,
-		 * set this to true, otherwise feel free to experiment with false
-		 */
-		UPROPERTY(EditAnywhere, Category = "MVAWS|SQS")
-		bool SyncDelete = true;
-		
-		/**
 		 * @brief set to true if you want SQS handler delegate to fire on game thread.
 		 * It may be beneficial in certain use cases to not not wait for the next game tick but
 		 * be able to react right away. If setting this to true, the handler will be called in
