@@ -19,7 +19,7 @@ AAWSConnectionConfig::AAWSConnectionConfig()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent")));
 	RootComponent->SetMobility(EComponentMobility::Static);
 
-	static ConstructorHelpers::FObjectFinder<UTexture2D> aws_sprite(TEXT("/MVAWS/Decals/MVAWS_Logo.MVAWS_Logo"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> aws_sprite(TEXT("/MVAWS/Decals/AWSLogo.AWSLogo"));
 	if (aws_sprite.Succeeded()) {
 		m_aws_icon_texture = aws_sprite.Object;
 
@@ -47,9 +47,7 @@ void AAWSConnectionConfig::BeginPlay() {
 		return;
 	}
 
-	//get queue url from environment variable
-	char* buf = nullptr;
-	size_t sz = 0;
+	// get queue url from environment variable
 
 	if (!QueueUrlEnvVariableName.IsEmpty()) {
 
