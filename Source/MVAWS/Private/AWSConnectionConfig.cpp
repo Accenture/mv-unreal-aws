@@ -4,13 +4,14 @@
  */
 #include "AWSConnectionConfig.h"
 #include "MVAWS.h"
+#include "Utils.h"
 
 #include "Components/SceneComponent.h"
 #include "Components/BillboardComponent.h"
 
 AAWSConnectionConfig::AAWSConnectionConfig()
-	: AActor()
-{
+	: AActor() {
+
 	PrimaryActorTick.bCanEverTick = false;
 	SetActorEnableCollision(false);
 	SetReplicates(false);
@@ -18,9 +19,8 @@ AAWSConnectionConfig::AAWSConnectionConfig()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent")));
 	RootComponent->SetMobility(EComponentMobility::Static);
 
-	static ConstructorHelpers::FObjectFinder<UTexture2D> aws_sprite(TEXT("/MVAWS/Decals/AWSLogo.AWSLogo"));
-	if (aws_sprite.Succeeded()) 
-	{
+	static ConstructorHelpers::FObjectFinder<UTexture2D> aws_sprite(TEXT("/MVAWS/Decals/MVAWS_Logo.MVAWS_Logo"));
+	if (aws_sprite.Succeeded()) {
 		m_aws_icon_texture = aws_sprite.Object;
 
 		// This creates a little in-Editor icon for the config so one can see it in scene
@@ -28,13 +28,14 @@ AAWSConnectionConfig::AAWSConnectionConfig()
 		m_sprite_component = CreateDefaultSubobject<UBillboardComponent>(TEXT("SpriteComponent"));
 		m_sprite_component->SetMobility(EComponentMobility::Static);
 		m_sprite_component->SetSprite(m_aws_icon_texture);
+		m_sprite_component->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 #endif
 	}
 }
 
 // Called when the game starts or when spawned
-void AAWSConnectionConfig::BeginPlay() 
-{
+void AAWSConnectionConfig::BeginPlay() {
+
 	Super::BeginPlay();
 
 	// We notify our module we are in the world and ready to play
@@ -50,23 +51,15 @@ void AAWSConnectionConfig::BeginPlay()
 	char* buf = nullptr;
 	size_t sz = 0;
 
-	if(this->QueueUrlEnvVariableName.IsEmpty() == false)
-	{
-		FString environmentValue;
-		if (_dupenv_s(&buf, &sz, TCHAR_TO_ANSI(*this->QueueUrlEnvVariableName)) == 0 && buf != nullptr)
-		{
-			environmentValue = buf;
-			free(buf);
-		}
+	if (!QueueUrlEnvVariableName.IsEmpty()) {
 
-		if (environmentValue.IsEmpty() == false)
-		{
-			UE_LOG(LogMVAWS, Log, TEXT("Found Environment Variable \"%s\". Use QueueURL \"%s\""), *this->QueueUrlEnvVariableName, *environmentValue);
-			this->QueueURL = environmentValue;
-		}
-		else
-		{
-			UE_LOG(LogMVAWS, Warning, TEXT("Environment Variable \"%s\" not found or empty! Used default QueueURL \"%s\""), *this->QueueUrlEnvVariableName, *this->QueueURL);
+		const FString environmentValue = readenv(QueueUrlEnvVariableName);
+		
+		if (!environmentValue.IsEmpty()) {
+			UE_LOG(LogMVAWS, Log, TEXT("Found Environment Variable '%s'. Use QueueURL '%s'"), *QueueUrlEnvVariableName, *environmentValue);
+			QueueURL = environmentValue;
+		} else {
+			UE_LOG(LogMVAWS, Warning, TEXT("Environment Variable '%s' not found or empty! Used default QueueURL '%s'"), *QueueUrlEnvVariableName, *QueueURL);
 		}
 	}
 	
