@@ -28,7 +28,7 @@ AAWSConnectionConfig::AAWSConnectionConfig()
 		m_sprite_component = CreateDefaultSubobject<UBillboardComponent>(TEXT("SpriteComponent"));
 		m_sprite_component->SetMobility(EComponentMobility::Static);
 		m_sprite_component->SetSprite(m_aws_icon_texture);
-		m_sprite_component->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		m_sprite_component->SetupAttachment(RootComponent);
 #endif
 	}
 }
