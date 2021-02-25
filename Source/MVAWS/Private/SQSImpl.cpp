@@ -23,6 +23,9 @@
 #include <aws/sqs/model/ReceiveMessageRequest.h>
 #include <aws/sqs/model/ReceiveMessageResult.h>
 #include <aws/sqs/model/DeleteMessageRequest.h>
+#include <aws/sqs/model/ChangeMessageVisibilityRequest.h>
+
+
 #include "Windows/PostWindowsApi.h"
 
 using namespace Aws::SQS::Model;
@@ -161,7 +164,7 @@ void USQSImpl::long_poll() noexcept
 	}
 }
 
-void USQSImpl::process_message(const Message &n_message) const noexcept
+void USQSImpl::process_message(const Message &n_message) noexcept
 {
 	UE_LOG(LogMVAWS, Display, TEXT("process_message '%s'"), UTF8_TO_TCHAR(n_message.GetMessageId().c_str()));
 	
@@ -210,6 +213,8 @@ void USQSImpl::process_message(const Message &n_message) const noexcept
 	{
 		trace_id = trace_id.Left(idx);
 	}
+		
+	m_receipt_handle = n_message.GetReceiptHandle();
 
 	// Now construct a message which will be given into the handler
 	const FMVAWSMessage m{
@@ -267,4 +272,29 @@ void USQSImpl::delete_message(const Message &n_message) const noexcept
 		UE_LOG(LogMVAWS, Error, TEXT("Deletion of message '%s' failed: "), UTF8_TO_TCHAR(n_message.GetMessageId().c_str()), UTF8_TO_TCHAR(outcome.GetError().GetMessage().c_str()));
 	}
 }
+
+
+void USQSImpl::change_messageVisibiltyTimeout(int messageVisbilityTimeout) const noexcept
+{	
+	if (!m_receipt_handle.empty())
+	{
+		ChangeMessageVisibilityRequest changetimeout_req;
+		changetimeout_req.SetQueueUrl(m_queue_url);
+		changetimeout_req.SetReceiptHandle(m_receipt_handle);
+		changetimeout_req.SetVisibilityTimeout(messageVisbilityTimeout);
+
+		const ChangeMessageVisibilityOutcome outcome = m_sqs->ChangeMessageVisibility(changetimeout_req);			
+
+		if (outcome.IsSuccess())
+		{
+			UE_LOG(LogMVAWS, Log, TEXT("Message Visibility timeout extended by %i seconds"), changetimeout_req.GetVisibilityTimeout());
+		}
+		else
+		{
+			UE_LOG(LogMVAWS, Warning, TEXT("Message Visibility timeout was not extended"));
+		}
+	}
+
+}
+
 

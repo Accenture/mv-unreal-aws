@@ -201,6 +201,11 @@ void FMVAWSModule::count_sqs_message() noexcept
 	return m_monitoring_impl->count_sqs_message();
 }
 
+void FMVAWSModule::change_messageVisibiltyTimeout(int messageVisbilityTimeout) noexcept
+{
+	checkf(m_sqs_impl, TEXT("SQS impl object was not created"));
+	m_sqs_impl->change_messageVisibiltyTimeout(messageVisbilityTimeout);
+}
 #undef LOCTEXT_NAMESPACE
 
 IMPLEMENT_GAME_MODULE(FMVAWSModule, MVAWS)

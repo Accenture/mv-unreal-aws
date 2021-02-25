@@ -219,5 +219,7 @@ class MVAWS_API IMVAWSModule : public IModuleInterface
 			static const FName ModuleName = "MVAWS";
 			return FModuleManager::LoadModuleChecked<IMVAWSModule>(ModuleName);
 		}
+
+		virtual void change_messageVisibiltyTimeout(int32 renderJobProgressInterval) noexcept = 0;
 };
 

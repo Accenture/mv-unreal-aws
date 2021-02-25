@@ -40,6 +40,8 @@ class FMVAWSModule : public IMVAWSModule
 		void count_file_upload(const float n_milliseconds) noexcept override;
 		void count_sqs_message() noexcept override;
 
+		void change_messageVisibiltyTimeout(int renderJobProgressInterval) noexcept override;
+
 		// IModuleInterface interface
 		void StartupModule() override;
 		void ShutdownModule() override;
