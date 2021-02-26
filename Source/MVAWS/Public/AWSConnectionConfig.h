@@ -27,7 +27,7 @@ class MVAWS_API AAWSConnectionConfig : public AActor
 		/** Setting this to false inhibits the actors behavior of connecting
 		 *  in BeginPlay()
 		 */
-		UPROPERTY(EditAnywhere, Category = "AWSConnection")
+		UPROPERTY(EditAnywhere, Category = "MVAWS|General")
 		bool Active = true;
 
 		/** 
