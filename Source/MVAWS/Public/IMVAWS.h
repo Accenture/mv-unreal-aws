@@ -220,6 +220,6 @@ class MVAWS_API IMVAWSModule : public IModuleInterface
 			return FModuleManager::LoadModuleChecked<IMVAWSModule>(ModuleName);
 		}
 
-		virtual void change_messageVisibiltyTimeout(int32 renderJobProgressInterval) noexcept = 0;
+		virtual void set_message_visibilty_timeout(const FMVAWSMessage& n_message, const int n_timeout) noexcept = 0;
 };
 

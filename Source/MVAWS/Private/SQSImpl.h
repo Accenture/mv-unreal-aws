@@ -48,16 +48,17 @@ class USQSImpl : public UObject {
 		/**
 		*	Sets the new visibility timeout value in seconds for the message being in the queue
 		*	The message should not visible to other customers, for the delete message request to 
-		*	be successful. 
+		*	be successful. Calling the client from game thread is thread-safe
+		*   https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/using-service-client.html
 		*/
-		void change_messageVisibiltyTimeout(int messageVisbilityTimeout) const noexcept;
+		void set_message_visibilty_timeout(const FMVAWSMessage& n_message,const int n_timeout) const noexcept;
 
 	private:
 		// running in thread
 		void long_poll() noexcept;
 
 		// copy messages out of a received bunch into our local storage
-		void process_message(const Aws::SQS::Model::Message &n_message) noexcept;
+		void process_message(const Aws::SQS::Model::Message &n_message) const noexcept;
 
 		void delete_message(const Aws::SQS::Model::Message &n_message) const noexcept;
 
@@ -71,7 +72,5 @@ class USQSImpl : public UObject {
 		TAtomic<bool>         m_poll_interrupted;
 
 		FOnSQSMessageReceived m_delegate;
-
-		Aws::String			  m_receipt_handle;
 
 };

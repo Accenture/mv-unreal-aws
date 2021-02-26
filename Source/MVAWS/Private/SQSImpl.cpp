@@ -164,7 +164,7 @@ void USQSImpl::long_poll() noexcept
 	}
 }
 
-void USQSImpl::process_message(const Message &n_message) noexcept
+void USQSImpl::process_message(const Message &n_message) const noexcept
 {
 	UE_LOG(LogMVAWS, Display, TEXT("process_message '%s'"), UTF8_TO_TCHAR(n_message.GetMessageId().c_str()));
 	
@@ -213,8 +213,6 @@ void USQSImpl::process_message(const Message &n_message) noexcept
 	{
 		trace_id = trace_id.Left(idx);
 	}
-		
-	m_receipt_handle = n_message.GetReceiptHandle();
 
 	// Now construct a message which will be given into the handler
 	const FMVAWSMessage m{
@@ -274,27 +272,25 @@ void USQSImpl::delete_message(const Message &n_message) const noexcept
 }
 
 
-void USQSImpl::change_messageVisibiltyTimeout(int messageVisbilityTimeout) const noexcept
+void USQSImpl::set_message_visibilty_timeout(const FMVAWSMessage& n_message, const int n_timeout) const noexcept
 {	
-	if (!m_receipt_handle.empty())
+	ChangeMessageVisibilityRequest changetimeout_req;
+	changetimeout_req.SetQueueUrl(m_queue_url);
+
+	std::string receipt = TCHAR_TO_UTF8((*n_message.m_receipt));
+	changetimeout_req.SetReceiptHandle(receipt.c_str());
+	changetimeout_req.SetVisibilityTimeout(n_timeout);
+
+	const ChangeMessageVisibilityOutcome outcome = m_sqs->ChangeMessageVisibility(changetimeout_req);
+
+	if (outcome.IsSuccess())
 	{
-		ChangeMessageVisibilityRequest changetimeout_req;
-		changetimeout_req.SetQueueUrl(m_queue_url);
-		changetimeout_req.SetReceiptHandle(m_receipt_handle);
-		changetimeout_req.SetVisibilityTimeout(messageVisbilityTimeout);
-
-		const ChangeMessageVisibilityOutcome outcome = m_sqs->ChangeMessageVisibility(changetimeout_req);			
-
-		if (outcome.IsSuccess())
-		{
-			UE_LOG(LogMVAWS, Log, TEXT("Message Visibility timeout extended by %i seconds"), changetimeout_req.GetVisibilityTimeout());
-		}
-		else
-		{
-			UE_LOG(LogMVAWS, Warning, TEXT("Message Visibility timeout was not extended"));
-		}
+		UE_LOG(LogMVAWS, Log, TEXT("Message visibility timeout extended by %i seconds"), changetimeout_req.GetVisibilityTimeout());
 	}
-
+	else
+	{
+		UE_LOG(LogMVAWS, Error, TEXT("Message visibility timeout was not extended"));
+	}
 }
 
 

@@ -4,6 +4,7 @@
  */
 #include "MVAWS.h"
 #include "AWSConnectionConfig.h"
+#include "Utils.h"
 #include "MonitoringImpl.h"
 #include "CloudWatchOutputDevice.h"
 #include "XRayImpl.h"
@@ -38,7 +39,7 @@ void FMVAWSModule::init_actor_ready(const AAWSConnectionConfig *n_config) {
 	checkf(m_s3_impl,   TEXT("S3 impl object was not created"));
 	checkf(m_sqs_impl,  TEXT("SQS impl object was not created"));
 	
-	if (n_config) {
+	if (n_config && n_config->Active) {
 		m_xray_enabled = xray_enabled(n_config->XRayEnabled);
 
 		// Create a CloudWatch log output device so all logs
@@ -201,10 +202,10 @@ void FMVAWSModule::count_sqs_message() noexcept
 	return m_monitoring_impl->count_sqs_message();
 }
 
-void FMVAWSModule::change_messageVisibiltyTimeout(int messageVisbilityTimeout) noexcept
+void FMVAWSModule::set_message_visibilty_timeout(const FMVAWSMessage& n_message, const int n_timeout) noexcept
 {
 	checkf(m_sqs_impl, TEXT("SQS impl object was not created"));
-	m_sqs_impl->change_messageVisibiltyTimeout(messageVisbilityTimeout);
+	m_sqs_impl->set_message_visibilty_timeout(n_message, n_timeout);
 }
 #undef LOCTEXT_NAMESPACE
 
