@@ -24,6 +24,9 @@ class MVAWS_API AAWSConnectionConfig : public AActor
 		void BeginPlay() override;
 		void EndPlay(const EEndPlayReason::Type n_reason) override;
 
+		UPROPERTY(EditAnywhere, Category = "AWSConnection")
+		bool Active = true;
+
 		/** 
 		 * @brief Set to true to make the AWS SDK log.
 		 * Log files will be generated in the current directory the application

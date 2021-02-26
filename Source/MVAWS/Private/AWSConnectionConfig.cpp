@@ -38,6 +38,9 @@ void AAWSConnectionConfig::BeginPlay() {
 
 	Super::BeginPlay();
 
+	if (!startOnPlay)
+		return;
+
 	// We notify our module we are in the world and ready to play
 	FMVAWSModule *mod = FModuleManager::Get().GetModulePtr<FMVAWSModule>("MVAWS");
 

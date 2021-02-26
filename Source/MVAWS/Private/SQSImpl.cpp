@@ -23,6 +23,9 @@
 #include <aws/sqs/model/ReceiveMessageRequest.h>
 #include <aws/sqs/model/ReceiveMessageResult.h>
 #include <aws/sqs/model/DeleteMessageRequest.h>
+#include <aws/sqs/model/ChangeMessageVisibilityRequest.h>
+
+
 #include "Windows/PostWindowsApi.h"
 
 using namespace Aws::SQS::Model;
@@ -271,4 +274,27 @@ void USQSImpl::delete_message(const Message &n_message) const noexcept
 		UE_LOG(LogMVAWS, Error, TEXT("Deletion of message '%s' failed: "), UTF8_TO_TCHAR(n_message.GetMessageId().c_str()), UTF8_TO_TCHAR(outcome.GetError().GetMessage().c_str()));
 	}
 }
+
+
+void USQSImpl::set_message_visibilty_timeout(const FMVAWSMessage& n_message, const int n_timeout) const noexcept
+{	
+	ChangeMessageVisibilityRequest changetimeout_req;
+	changetimeout_req.SetQueueUrl(m_queue_url);
+
+	std::string receipt = TCHAR_TO_UTF8((*n_message.m_receipt));
+	changetimeout_req.SetReceiptHandle(receipt.c_str());
+	changetimeout_req.SetVisibilityTimeout(n_timeout);
+
+	const ChangeMessageVisibilityOutcome outcome = m_sqs->ChangeMessageVisibility(changetimeout_req);
+
+	if (outcome.IsSuccess())
+	{
+		UE_LOG(LogMVAWS, Log, TEXT("Message visibility timeout extended by %i seconds"), changetimeout_req.GetVisibilityTimeout());
+	}
+	else
+	{
+		UE_LOG(LogMVAWS, Error, TEXT("Message visibility timeout was not extended"));
+	}
+}
+
 
