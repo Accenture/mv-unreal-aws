@@ -53,6 +53,10 @@ bool USQSImpl::start_polling(FOnSQSMessageReceived &&n_delegate) {
 		client_config.endpointOverride = TCHAR_TO_UTF8(*sqs_endpoint);
 	}
 
+	// Must be longer than long polling wait time
+	client_config.httpRequestTimeoutMs = 7000;
+	client_config.requestTimeoutMs = 6000;
+
 	m_sqs = MakeShareable<Aws::SQS::SQSClient>(new Aws::SQS::SQSClient(client_config));
 	m_delegate = n_delegate;
 
@@ -142,16 +146,16 @@ void USQSImpl::long_poll() noexcept
 			continue;
 		}
 
-		UE_LOG(LogMVAWS, Verbose, TEXT("Long polling returned from queue '%s'"), UTF8_TO_TCHAR(m_queue_url.c_str()));
-
 		if (rm_out.GetResult().GetMessages().empty())
 		{
 			// no messages in Q
-			UE_LOG(LogMVAWS, Display, TEXT("Long polling returned from queue '%s', no messages"), UTF8_TO_TCHAR(m_queue_url.c_str()));
+			UE_LOG(LogMVAWS, Display, TEXT("Long polling returned from queue '%s' with a timeout of %is, no messages"), 
+					UTF8_TO_TCHAR(m_queue_url.c_str()), m_long_poll_wait_time);
 			continue;
 		}
 
-		UE_LOG(LogMVAWS, Display, TEXT("Long polling returned from queue '%s', %i messages"), UTF8_TO_TCHAR(m_queue_url.c_str()), rm_out.GetResult().GetMessages().size());
+		UE_LOG(LogMVAWS, Display, TEXT("Long polling with a timeout of %is returned from queue '%s', %i messages"),
+				m_long_poll_wait_time, UTF8_TO_TCHAR(m_queue_url.c_str()), rm_out.GetResult().GetMessages().size());
 
 		// Now get the messages and copy into our local storage.
 		// They will accumulate until the consumer retrieves them

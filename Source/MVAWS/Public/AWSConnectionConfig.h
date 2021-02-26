@@ -101,9 +101,12 @@ class MVAWS_API AAWSConnectionConfig : public AActor
 		 * during teardown. This means, the lower the value, the faster the engine can
 		 * shut down at the expense of more AWS SDK calls and therefore higher costs.
 		 * 5 seconds should be a good start.
+		 * 
+		 * For unknown reasons, setting this to values of >~5 appears to be buggy on occasion.
+		 * See here: https://github.com/aws/aws-sdk-cpp/issues/962
 		 */
 		UPROPERTY(EditAnywhere, Category = "MVAWS|SQS", Meta = (ClampMin = "1", ClampMax = "20"))
-		int LongPollWait = 5;
+		int LongPollWait = 4;
 
 		/**
 		 * @brief set to true if you want SQS handler delegate to fire on game thread.
