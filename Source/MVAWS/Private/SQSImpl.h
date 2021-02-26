@@ -48,8 +48,7 @@ class USQSImpl : public UObject {
 		/**
 		*	Sets the new visibility timeout value in seconds for the message being in the queue
 		*	The message should not visible to other customers, for the delete message request to 
-		*	be successful. Calling the client from game thread is thread-safe
-		*   https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/using-service-client.html
+		*	be successful. Can be called from any thread.
 		*/
 		void set_message_visibilty_timeout(const FMVAWSMessage& n_message,const int n_timeout) const noexcept;
 

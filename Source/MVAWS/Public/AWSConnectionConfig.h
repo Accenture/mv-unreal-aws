@@ -24,6 +24,9 @@ class MVAWS_API AAWSConnectionConfig : public AActor
 		void BeginPlay() override;
 		void EndPlay(const EEndPlayReason::Type n_reason) override;
 
+		/** Setting this to false inhibits the actors behavior of connecting
+		 *  in BeginPlay()
+		 */
 		UPROPERTY(EditAnywhere, Category = "AWSConnection")
 		bool Active = true;
 
