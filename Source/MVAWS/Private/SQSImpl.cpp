@@ -296,7 +296,7 @@ void USQSImpl::set_message_visibilty_timeout(const FMVAWSMessage& n_message, con
 	}
 	else
 	{
-		UE_LOG(LogMVAWS, Error, TEXT("Message visibility timeout of message '%s' was not extended: %s"), UTF8_TO_TCHAR(*n_message.m_message_id), UTF8_TO_TCHAR(outcome.GetError().GetMessage().c_str()));
+		UE_LOG(LogMVAWS, Error, TEXT("Message visibility timeout of message '%s' was not extended: %s"), TCHAR_TO_UTF8(*n_message.m_message_id), UTF8_TO_TCHAR(outcome.GetError().GetMessage().c_str()));
 	}
 }
 
