@@ -34,6 +34,11 @@
 
 using namespace Aws::S3::Model;
 
+/** I'm trying to switch to a globally used client object here as well as
+ *  AWS docs state that those objects are threadsafe.
+ */
+static TUniquePtr<Aws::S3::S3Client> s_s3_client;
+
 namespace 
 {
 
@@ -85,7 +90,9 @@ class MembufUploadAsyncTask : public FNonAbandonableTask
 			UE_LOG(LogMVAWS, Display, TEXT("Starting upload"));
 
 			// Create a S3 client object and assemble request
-			Aws::S3::S3Client s3;
+			if (!s_s3_client) {
+				s_s3_client = MakeUnique<Aws::S3::S3Client>();
+			}
 
 			PutObjectRequest request;
 			request.SetBucket(TCHAR_TO_ANSI(*m_target.BucketName));
@@ -103,7 +110,7 @@ class MembufUploadAsyncTask : public FNonAbandonableTask
 			request.SetBody(input_data);
 
 			// issue the put request
-			const PutObjectOutcome outcome = s3.PutObject(request);
+			const PutObjectOutcome outcome = s_s3_client->PutObject(request);
 
 			// If we have a completion handler, execute it on the game thread like guaranteed in the interface
 			if (m_completion_delegate.IsBound()) 
@@ -195,7 +202,9 @@ class FileUploadAsyncTask : public FNonAbandonableTask
 			UE_LOG(LogMVAWS, Display, TEXT("Starting upload"));
 
 			// Create a S3 client object and assemble request
-			Aws::S3::S3Client s3;
+			if (!s_s3_client) {
+				s_s3_client = MakeUnique<Aws::S3::S3Client>();
+			}
 
 			PutObjectRequest request;
 			request.SetBucket(TCHAR_TO_ANSI(*m_target.BucketName));
@@ -209,7 +218,7 @@ class FileUploadAsyncTask : public FNonAbandonableTask
 			request.SetBody(input_data);
 
 			// issue the put request
-			const PutObjectOutcome outcome = s3.PutObject(request);
+			const PutObjectOutcome outcome = s_s3_client->PutObject(request);
 
 			// If we have a completion handler, execute it on the game thread like guaranteed in the interface
 			if (m_completion_delegate.IsBound())
