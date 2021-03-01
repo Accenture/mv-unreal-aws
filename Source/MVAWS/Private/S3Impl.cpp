@@ -3,6 +3,7 @@
  * See attached file LICENSE for full details
  */
 #include "S3Impl.h"
+#include "Utils.h"
 
 // Engine
 #include "Async/AsyncWork.h"
