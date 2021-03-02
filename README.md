@@ -174,9 +174,9 @@ Uploading a file works much the same way but takes a filename on disk rather tha
 
 ## SQS
 SQS usage can start during startup phase.
-The plugin expects the Q to support long polling with a timeout of `LongPollWait` seconds. Defaults to 5. 
+The plugin expects the Q to support long polling with a timeout of `LongPollWait` seconds. Defaults to 4. 
 It uses a background thread that continuously long polls. This means, the thread 
-will poll with a timeout of 5 seconds to retrieve exactly one message to be processed.
+will poll with a timeout of 4 seconds to retrieve exactly one message to be processed.
 When the message was received it blocks until it is processed and then continue to cycle until stopped.
 
 Business logic must implement a handler function for incoming
