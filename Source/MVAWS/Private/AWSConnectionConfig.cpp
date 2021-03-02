@@ -10,11 +10,11 @@
 #include "Components/BillboardComponent.h"
 
 AAWSConnectionConfig::AAWSConnectionConfig()
-	: AActor() {
+		: AActor() {
 
 	PrimaryActorTick.bCanEverTick = false;
 	SetActorEnableCollision(false);
-	SetReplicates(false);
+	bReplicates = false;
 
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent")));
 	RootComponent->SetMobility(EComponentMobility::Static);
