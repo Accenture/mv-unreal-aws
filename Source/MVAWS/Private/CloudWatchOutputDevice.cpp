@@ -51,7 +51,7 @@ void FCloudWatchLogOutputDevice::TearDown()
 	// we are running
 	if (m_logger_thread)
 	{
-		UE_LOG(LogMVAWS, Display, TEXT("Shutting down logging thread"));
+		// UE_LOG(LogMVAWS, Display, TEXT("Shutting down logging thread"));
 		m_logger_interrupted.Store(true);
 		m_logger_thread->Join();
 		m_logger_thread.Reset();
