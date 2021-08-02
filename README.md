@@ -18,7 +18,7 @@ folder of your Unreal Project. Like this:
 ```
 cd /your/Unreal/Project
 cd Plugins
-git clone --depth 1 --recursive git@github.com:mackevision/mv-unreal-aws.git MVAWS
+git clone --depth 1 --recursive git@github.com:Accenture/mv-unreal-aws.git MVAWS
 ```
 
 Re-create the Visual Studio project solution afterwards.
